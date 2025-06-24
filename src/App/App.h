@@ -27,6 +27,7 @@ private:
 
 private:
     GLFWwindow* mainWindow;
+    glm::vec2 mainWindowDefautSize = glm::vec2(1280, 720);
 
     ControlWindow* controlWindow;
     bool showControlWindow;

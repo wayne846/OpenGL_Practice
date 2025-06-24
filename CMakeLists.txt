@@ -12,6 +12,7 @@ include_directories(
     include/GLFW
     include/glm
     include/imgui
+    include/assimp
     src
 )
 
@@ -31,11 +32,13 @@ source_group(TREE ${CMAKE_SOURCE_DIR}/assets/shaders PREFIX "Shaders" FILES ${SH
 # Library paths
 link_directories(${CMAKE_SOURCE_DIR}/lib/glew)
 link_directories(${CMAKE_SOURCE_DIR}/lib/GLFW)
+link_directories(${CMAKE_SOURCE_DIR}/lib/assimp)
 
 # Link with libraries
 target_link_libraries(OpenGL_Practice
     ${CMAKE_SOURCE_DIR}/lib/GLFW/glfw3.lib
     ${CMAKE_SOURCE_DIR}/lib/glew/glew32.lib
+    ${CMAKE_SOURCE_DIR}/lib/assimp/assimp-vc143-mtd.lib
     opengl32
 )
 

@@ -17,16 +17,15 @@ public:
 	Scene();
 	~Scene();
 
-	virtual bool Initialize();
+	virtual bool Initialize(float aspect);
 	virtual void Update(double dt);
 	virtual void Render();
 
 	virtual void OnResize(int width, int height);
 	virtual void OnKeyboard(int key, int action);
 
-private:
+protected:
 	Camera camera;
-
 };
 
 

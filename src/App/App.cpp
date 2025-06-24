@@ -7,6 +7,7 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 
 #include "App.h"
+#include "../Scene/MainScene.h"
 
 App::App() {
 	mainWindow = nullptr;
@@ -37,7 +38,7 @@ auto App::Initialize() -> bool {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
 	// Create window with graphics context
-	mainWindow = glfwCreateWindow(1280, 720, "cg-gui", nullptr, nullptr);
+	mainWindow = glfwCreateWindow(mainWindowDefautSize.x, mainWindowDefautSize.y, "cg-gui", nullptr, nullptr);
 	if (mainWindow == nullptr)
 		return false;
 	glfwMakeContextCurrent(mainWindow);
@@ -91,8 +92,8 @@ auto App::Initialize() -> bool {
 	controlWindow = new ControlWindow();
 	controlWindow->Initialize();
 
-	currentScene = new Scene();
-	currentScene->Initialize();
+	currentScene = new MainScene();
+	currentScene->Initialize(mainWindowDefautSize.x / mainWindowDefautSize.y);
 
 	controlWindow->SetTargetScene(currentScene);
 
