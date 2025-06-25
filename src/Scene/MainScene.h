@@ -14,7 +14,10 @@ public:
 	void Render() override;
 
 	void OnResize(int width, int height) override;
-	//void OnKeyboard(int key, int action) override;
+	void OnKeyboard(int key, int action) override;
+	void OnMouseButton(int button, int action, int mods) override;
+	void OnMouseMove(double x, double y) override;
+	void OnScroll(double xoffset, double yoffset) override;
 
 private:
 	void LoadShader();

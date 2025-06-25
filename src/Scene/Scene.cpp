@@ -32,3 +32,15 @@ void Scene::OnResize(int width, int height) {
 void Scene::OnKeyboard(int key, int action) {
 	std::cout << "Scene OnKeyboard: " << key << " " << action << std::endl;
 }
+
+void Scene::OnMouseButton(int button, int action, int mods) {
+	std::cout << "Scene OnMouseButton: " << button << " " << action << " " << mods << std::endl;
+}
+
+void Scene::OnMouseMove(double x, double y) {
+	std::cout << "Scene OnMouseMove: " << x << " " << y << std::endl;
+}
+
+void Scene::OnScroll(double xoffset, double yoffset) {
+	std::cout << "Scene OnScroll: " << xoffset << " " << yoffset << std::endl;
+}

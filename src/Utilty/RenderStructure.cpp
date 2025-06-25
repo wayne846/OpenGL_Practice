@@ -6,6 +6,9 @@
 #include "MathHelper.h"
 
 #pragma region Transform
+/// <summary>
+/// 將Transform轉換成Model Matrix，應用的順序是：縮放->旋轉->平移->父級
+/// </summary>
 glm::mat4 Transform::ToMatrix() {
     glm::mat4 s = glm::scale(glm::mat4(1.0f), scale);
     glm::mat4 t = glm::translate(glm::mat4(1.0f), position);
@@ -24,6 +27,12 @@ glm::mat4 Transform::ToMatrix() {
 #pragma endregion
 
 #pragma region Texture
+/// <summary>
+/// 讀取貼圖，傳回該貼圖的id
+/// </summary>
+/// <param name="path">檔案路徑</param>
+/// <param name="gammaCorrection">true: srgb，false: rgb</param>
+/// <returns></returns>
 unsigned int Texture::LoadTexture(const std::string path, bool gammaCorrection)
 {
     unsigned int textureID;
@@ -79,6 +88,9 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     SetupMesh();
 }
 
+/// <summary>
+/// 設定VAO、VBO等資訊
+/// </summary>
 void Mesh::SetupMesh()
 {
     glGenVertexArrays(1, &VAO);
@@ -110,6 +122,9 @@ void Mesh::SetupMesh()
     glBindVertexArray(0);
 }
 
+/// <summary>
+/// 將網格畫出來
+/// </summary>
 void Mesh::Draw(Shader& shader) {
     // set model matrix
     shader.setMat4("model", transform.ToMatrix());
@@ -135,12 +150,18 @@ Model::Model(std::string path)
     LoadModel(path);
 }
 
+/// <summary>
+/// 把模型的所有網格畫出來
+/// </summary>
 void Model::Draw(Shader &shader) {
     for (unsigned int i = 0; i < meshes.size(); i++) {
         meshes[i].Draw(shader);
     }
 }
 
+/// <summary>
+/// 回傳網格的參考
+/// </summary>
 Mesh& Model::GetMesh(int index) {
     if (index < 0 || index >= meshes.size()) {
         std::cout << "ERROR: index out of range\n";
@@ -148,6 +169,10 @@ Mesh& Model::GetMesh(int index) {
     return meshes[index];
 }
 
+/// <summary>
+/// 讀取模型，只有節點資料，不包含材質
+/// </summary>
+/// <param name="path">檔案路徑</param>
 void Model::LoadModel(std::string path)
 {
     Assimp::Importer import;

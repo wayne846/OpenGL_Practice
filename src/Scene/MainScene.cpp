@@ -25,13 +25,14 @@ bool MainScene::Initialize(float aspect) {
 	LoadModel();
 
 	camera.SetAspect(aspect);
-	camera.LookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.SetPos(glm::vec3(0, 0, 2));
+	camera.LookAt(glm::vec3(0, 0, 0));
 
 	return true;
 }
 
 void MainScene::Update(double dt) {
-
+	camera.Update();
 }
 
 void MainScene::Render() {
@@ -51,10 +52,6 @@ void MainScene::Render() {
 
 	sphere->Draw(*shader);
 	glFlush();
-}
-
-void MainScene::OnResize(int width, int height) {
-	camera.SetAspect((float)width / (float)height);
 }
 
 void MainScene::LoadShader() {
@@ -90,3 +87,52 @@ void MainScene::LoadModel() {
 	Mesh& sphereMesh = sphere->GetMesh(0);
 	sphereMesh.material = badlands;
 }
+
+#pragma region Event
+/// <summary>
+/// 視窗縮放事件
+/// </summary>
+void MainScene::OnResize(int width, int height) {
+	camera.SetAspect((float)width / (float)height);
+}
+
+/// <summary>
+/// 鍵盤按鈕事件
+/// </summary>
+void MainScene::OnKeyboard(int key, int action) {
+	switch (key)
+	{
+	case GLFW_KEY_W:
+	case GLFW_KEY_S:
+	case GLFW_KEY_A:
+	case GLFW_KEY_D:
+	case GLFW_KEY_SPACE:
+		camera.OnKeyboard(key, action);
+		break;
+	}
+}
+
+/// <summary>
+/// 滑鼠按鈕事件
+/// </summary>
+/// <param name="button">0: 左鍵，1: 右鍵，2: 中鍵</param>
+/// <param name="action">0: 放開，1: 按下</param>
+/// <param name="mods"></param>
+void MainScene::OnMouseButton(int button, int action, int mods) {
+	camera.OnMouseButton(button, action);
+}
+
+/// <summary>
+/// 滑鼠移動事件，原點在視窗左上角
+/// </summary>
+void MainScene::OnMouseMove(double x, double y) {
+	camera.OnMouseMove(x, y);
+}
+
+/// <summary>
+/// 滑鼠滾輪滾動事件
+/// </summary>
+void MainScene::OnScroll(double xoffset, double yoffset) {
+	camera.OnScroll(xoffset, yoffset);
+}
+#pragma endregion

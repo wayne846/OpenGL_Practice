@@ -23,6 +23,9 @@ public:
 
 	virtual void OnResize(int width, int height);
 	virtual void OnKeyboard(int key, int action);
+	virtual void OnMouseButton(int button, int action, int mods);
+	virtual void OnMouseMove(double x, double y);
+	virtual void OnScroll(double xoffset, double yoffset);
 
 protected:
 	Camera camera;

@@ -7,6 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Shader.h"
+#include "MathHelper.h"
 
 struct Vertex {
 	glm::vec3 position;
@@ -20,9 +21,9 @@ public:
     glm::mat4 ToMatrix();
 
 public:
-    glm::vec3 position = glm::vec3(0, 0, 0);
-    glm::vec3 rotation = glm::vec3(0, 0, 0);
-    glm::vec3 scale = glm::vec3(1, 1, 1);
+    glm::vec3 position = MathHelper::VEC3_ZERO;
+    glm::vec3 rotation = MathHelper::VEC3_ZERO;
+    glm::vec3 scale = MathHelper::VEC3_ONE;
 
     Transform* parent = nullptr;
 };

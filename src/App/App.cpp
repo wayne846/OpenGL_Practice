@@ -71,8 +71,7 @@ auto App::Initialize() -> bool {
 	glfwSetWindowUserPointer(mainWindow, this);
 	glfwSetFramebufferSizeCallback(
 		mainWindow,
-		[](GLFWwindow* window, int w, int h)
-		{
+		[](GLFWwindow* window, int w, int h) {
 			auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
 			auto mainScene = app->GetCurrentScene();
 			mainScene->OnResize(w, h);
@@ -81,11 +80,46 @@ auto App::Initialize() -> bool {
 
 	glfwSetKeyCallback(
 		mainWindow,
-		[](GLFWwindow* window, int key, int scancode, int action, int mode)
-		{
+		[](GLFWwindow* window, int key, int scancode, int action, int mode) {
 			auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
 			auto mainScene = app->GetCurrentScene();
 			mainScene->OnKeyboard(key, action);
+		}
+	);
+
+	glfwSetMouseButtonCallback(
+		mainWindow,
+		[](GLFWwindow* window, int button, int action, int mods) {
+			ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+			if (ImGui::GetIO().WantCaptureMouse) return;
+
+			auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
+			auto mainScene = app->GetCurrentScene();
+			mainScene->OnMouseButton(button, action, mods);
+		}
+	);
+
+	glfwSetCursorPosCallback(
+		mainWindow,
+		[](GLFWwindow* window, double x, double y) {
+			ImGui_ImplGlfw_CursorPosCallback(window, x, y);
+			if (ImGui::GetIO().WantCaptureMouse) return;
+
+			auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
+			auto mainScene = app->GetCurrentScene();
+			mainScene->OnMouseMove(x, y);
+		}
+	);
+
+	glfwSetScrollCallback(
+		mainWindow,
+		[](GLFWwindow* window, double xoffset, double yoffset) {
+			ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+			if (ImGui::GetIO().WantCaptureMouse) return;
+
+			auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
+			auto mainScene = app->GetCurrentScene();
+			mainScene->OnScroll(xoffset, yoffset);
 		}
 	);
 

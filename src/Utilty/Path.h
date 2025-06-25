@@ -2,6 +2,9 @@
 #include <string>
 #include <Windows.h>
 
+/// <summary>
+/// 儲存素材的檔案路徑
+/// </summary>
 namespace Path {
 	namespace Shader {
 		const std::string STANDARD_VERT = "assets/shaders/Standard.vert";
