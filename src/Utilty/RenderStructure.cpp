@@ -2,15 +2,35 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <glm/gtc/matrix_transform.hpp> 
+#include "MathHelper.h"
+
+#pragma region Transform
+glm::mat4 Transform::ToMatrix() {
+    glm::mat4 s = glm::scale(glm::mat4(1.0f), scale);
+    glm::mat4 t = glm::translate(glm::mat4(1.0f), position);
+    glm::mat4 r;
+    glm::mat4 rx = glm::rotate(glm::mat4(1.0f), MathHelper::DegToRad(rotation.x), glm::vec3(1, 0, 0));
+    glm::mat4 ry = glm::rotate(glm::mat4(1.0f), MathHelper::DegToRad(rotation.y), glm::vec3(0, 1, 0));
+    glm::mat4 rz = glm::rotate(glm::mat4(1.0f), MathHelper::DegToRad(rotation.z), glm::vec3(0, 0, 1));
+    r = rz * ry * rx;
+
+    glm::mat4 m = t * r * s;
+    if (parent != nullptr) {
+        m = parent->ToMatrix() * m;
+    }
+    return m;
+}
+#pragma endregion
 
 #pragma region Texture
-unsigned int Texture::LoadTexture(char const* path, bool gammaCorrection)
+unsigned int Texture::LoadTexture(const std::string path, bool gammaCorrection)
 {
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
         GLenum internalFormat;
@@ -80,14 +100,28 @@ void Mesh::SetupMesh()
     // vertex normals
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    // vertex texture coords
+    // vertex tangent
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+    // vertex texture coords
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
     glBindVertexArray(0);
 }
 
 void Mesh::Draw(Shader& shader) {
+    // set model matrix
+    shader.setMat4("model", transform.ToMatrix());
+
+    // set texture
+    glActiveTexture(GL_TEXTURE0);
+    shader.setInt("material.texture_diffuse", 0);
+    glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
+    glActiveTexture(GL_TEXTURE1);
+    shader.setInt("material.texture_normal", 1);
+    glBindTexture(GL_TEXTURE_2D, material.normalMap.id);
+
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -96,16 +130,28 @@ void Mesh::Draw(Shader& shader) {
 #pragma endregion
 
 #pragma region Model
+Model::Model(std::string path)
+{
+    LoadModel(path);
+}
+
 void Model::Draw(Shader &shader) {
     for (unsigned int i = 0; i < meshes.size(); i++) {
         meshes[i].Draw(shader);
     }
 }
 
+Mesh& Model::GetMesh(int index) {
+    if (index < 0 || index >= meshes.size()) {
+        std::cout << "ERROR: index out of range\n";
+    }
+    return meshes[index];
+}
+
 void Model::LoadModel(std::string path)
 {
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -146,13 +192,18 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) {
         vector.z = mesh->mVertices[i].z;
         vertex.position = vector;
 
-        // normal
+        // normal and tangent
         if (mesh->HasNormals())
         {
             vector.x = mesh->mNormals[i].x;
             vector.y = mesh->mNormals[i].y;
             vector.z = mesh->mNormals[i].z;
             vertex.normal = vector;
+
+            vector.x = mesh->mTangents[i].x;
+            vector.y = mesh->mTangents[i].y;
+            vector.z = mesh->mTangents[i].z;
+            vertex.tangent = vector;
         }
 
         // texCoords

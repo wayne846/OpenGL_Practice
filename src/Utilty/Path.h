@@ -11,6 +11,14 @@ namespace Path {
 	namespace Model {
 		const std::string SPHERE = "assets/models/Sphere.obj";
 	}
+
+	namespace Texture {
+		const std::string BRICKWALL = "assets/textures/brickwall.jpg";
+		const std::string BRICKWALL_NORMAL = "assets/textures/brickwall_normal.jpg";
+
+		const std::string BADLANDS = "assets/textures/badlands_albedo.png";
+		const std::string BADLANDS_NORMAL = "assets/textures/badlands_normal.png";
+	}
 	
 	/// <summary>
 	/// 單例模式，用於轉換成絕對路徑

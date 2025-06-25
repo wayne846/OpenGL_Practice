@@ -18,12 +18,16 @@ public:
 
 private:
 	void LoadShader();
+	void LoadMaterial();
 	void LoadModel();
 
 private:
 	Shader* shader = nullptr;
 	
 	Model* sphere = nullptr;
+
+	Material brickwall;
+	Material badlands;
 
 	unsigned int matricesUBO = 0;
 };

@@ -91,6 +91,37 @@ public:
         glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
     }
 
+    void setVec3(const std::string& name, const glm::vec3& value) const
+    {
+        glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    }
+
+    void setVec3Arr(const std::string& name, const std::vector<glm::vec3>& value) const
+    {
+        std::vector<float> valurArr;
+        for (int i = 0; i < value.size(); i++) {
+            valurArr.push_back(value[i].x);
+            valurArr.push_back(value[i].y);
+            valurArr.push_back(value[i].z);
+        }
+        glUniform3fv(glGetUniformLocation(ID, name.c_str()), value.size(), valurArr.data());
+    }
+
+    void setVec4(const std::string& name, const glm::vec4& value) const
+    {
+        glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    }
+
+    void setMat4(const std::string& name, glm::mat4& value) const
+    {
+        glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    }
+
+    void setUniformBlock(const std::string& name, int uniformBlockBinding) const
+    {
+        glUniformBlockBinding(ID, glGetUniformBlockIndex(ID, name.c_str()), uniformBlockBinding);
+    }
+
 private:
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------

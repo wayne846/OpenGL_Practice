@@ -21,6 +21,7 @@ bool MainScene::Initialize(float aspect) {
 	glEnable(GL_CULL_FACE);
 
 	LoadShader();
+	LoadMaterial();
 	LoadModel();
 
 	camera.SetAspect(aspect);
@@ -43,6 +44,10 @@ void MainScene::Render() {
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetViewMatrix()));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera.GetProjectionMatrix()));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	// set light
+	shader->setVec3("lightDir", glm::vec3(-1, -1, 0));
+	shader->setVec3("eyePos", glm::vec3(0, 0, 2));
 
 	sphere->Draw(*shader);
 	glFlush();
@@ -72,6 +77,16 @@ void MainScene::LoadShader() {
 
 }
 
+void MainScene::LoadMaterial() {
+	brickwall.diffuseMap.id = Texture::LoadTexture(Path::Texture::BRICKWALL, true);
+	brickwall.normalMap.id = Texture::LoadTexture(Path::Texture::BRICKWALL_NORMAL, false);
+
+	badlands.diffuseMap.id = Texture::LoadTexture(Path::Texture::BADLANDS, true);
+	badlands.normalMap.id = Texture::LoadTexture(Path::Texture::BADLANDS_NORMAL, false);
+}
+
 void MainScene::LoadModel() {
 	sphere = new Model(Path::Model::SPHERE);
+	Mesh& sphereMesh = sphere->GetMesh(0);
+	sphereMesh.material = badlands;
 }
