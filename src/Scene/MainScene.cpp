@@ -33,6 +33,9 @@ bool MainScene::Initialize(float aspect) {
 
 void MainScene::Update(double dt) {
 	camera.Update();
+	glm::vec4 light = glm::vec4(lightDir, 1);
+	//light = glm::rotate(glm::mat4(1.0f), 0.03f, glm::vec3(0, 1, 0)) * light;
+	lightDir = glm::vec3(light);
 }
 
 void MainScene::Render() {
@@ -47,7 +50,7 @@ void MainScene::Render() {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	// set light
-	shader->setVec3("lightDir", glm::vec3(-1, -1, 0));
+	shader->setVec3("lightDir", lightDir);
 	shader->setVec3("eyePos", glm::vec3(0, 0, 2));
 
 	sphere->Draw(*shader);
@@ -80,12 +83,18 @@ void MainScene::LoadMaterial() {
 
 	badlands.diffuseMap.id = Texture::LoadTexture(Path::Texture::BADLANDS, true);
 	badlands.normalMap.id = Texture::LoadTexture(Path::Texture::BADLANDS_NORMAL, false);
+
+	plaster.diffuseMap.id = Texture::LoadTexture(Path::Texture::PLASTER, true);
+	plaster.normalMap.id = Texture::LoadTexture(Path::Texture::PLASTER_NORMAL, false);
+	plaster.roughness = 0.5;
+	plaster.subsurface = 0;
+	plaster.sheen = 1;
 }
 
 void MainScene::LoadModel() {
 	sphere = new Model(Path::Model::SPHERE);
 	Mesh& sphereMesh = sphere->GetMesh(0);
-	sphereMesh.material = badlands;
+	sphereMesh.material = plaster;
 }
 
 #pragma region Event

@@ -129,13 +129,17 @@ void Mesh::Draw(Shader& shader) {
     // set model matrix
     shader.setMat4("model", transform.ToMatrix());
 
-    // set texture
+    // set material
     glActiveTexture(GL_TEXTURE0);
     shader.setInt("material.texture_diffuse", 0);
     glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
     glActiveTexture(GL_TEXTURE1);
     shader.setInt("material.texture_normal", 1);
     glBindTexture(GL_TEXTURE_2D, material.normalMap.id);
+    shader.setFloat("material.roughness", material.roughness);
+    shader.setFloat("material.subsurface", material.subsurface);
+    shader.setFloat("material.sheen", material.sheen);
+    shader.setFloat("material.sheenTint", material.sheenTint);
 
     // draw mesh
     glBindVertexArray(VAO);

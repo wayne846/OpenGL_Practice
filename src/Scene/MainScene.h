@@ -31,6 +31,9 @@ private:
 
 	Material brickwall;
 	Material badlands;
+	Material plaster;
+
+	glm::vec3 lightDir = glm::vec3(-1, -1, 0);
 
 	unsigned int matricesUBO = 0;
 };

@@ -21,6 +21,9 @@ namespace Path {
 
 		const std::string BADLANDS = "assets/textures/badlands_albedo.png";
 		const std::string BADLANDS_NORMAL = "assets/textures/badlands_normal.png";
+
+		const std::string PLASTER = "assets/textures/Plaster_Color.jpg";
+		const std::string PLASTER_NORMAL = "assets/textures/Plaster_Normal.jpg";
 	}
 	
 	/// <summary>

@@ -40,6 +40,10 @@ public:
 struct Material {
     Texture diffuseMap;
     Texture normalMap;
+    float roughness = 0.5f;
+    float subsurface = 0.0f;
+    float sheen = 0.0f;
+    float sheenTint = 0.5f;
 };
 
 class Mesh {
