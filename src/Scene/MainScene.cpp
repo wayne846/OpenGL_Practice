@@ -51,7 +51,7 @@ void MainScene::Render() {
 
 	// set light
 	shader->setVec3("lightDir", lightDir);
-	shader->setVec3("eyePos", glm::vec3(0, 0, 2));
+	shader->setVec3("eyePos", camera.GetPos());
 
 	sphere->Draw(*shader);
 	glFlush();
@@ -87,8 +87,8 @@ void MainScene::LoadMaterial() {
 	plaster.diffuseMap.id = Texture::LoadTexture(Path::Texture::PLASTER, true);
 	plaster.normalMap.id = Texture::LoadTexture(Path::Texture::PLASTER_NORMAL, false);
 	plaster.roughness = 0.5;
-	plaster.subsurface = 0;
-	plaster.sheen = 1;
+	plaster.anisotropic = 0;
+	plaster.metallic = 0;
 }
 
 void MainScene::LoadModel() {

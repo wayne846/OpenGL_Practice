@@ -140,6 +140,10 @@ void Mesh::Draw(Shader& shader) {
     shader.setFloat("material.subsurface", material.subsurface);
     shader.setFloat("material.sheen", material.sheen);
     shader.setFloat("material.sheenTint", material.sheenTint);
+    shader.setFloat("material.anisotropic", material.anisotropic);
+    shader.setFloat("material.specular", material.specular);
+    shader.setFloat("material.specularTint", material.specularTint);
+    shader.setFloat("material.metallic", material.metallic);
 
     // draw mesh
     glBindVertexArray(VAO);

@@ -44,6 +44,10 @@ struct Material {
     float subsurface = 0.0f;
     float sheen = 0.0f;
     float sheenTint = 0.5f;
+    float anisotropic = 0;
+    float specular = 0.5;
+    float specularTint = 0;
+    float metallic = 0;
 };
 
 class Mesh {

@@ -18,10 +18,15 @@ struct Material {
     float subsurface;
     float sheen;
     float sheenTint;
+    float anisotropic;
+    float specular;
+    float specularTint;
+    float metallic;
 };
 uniform Material material;
 
 float pow5(float n);
+float pow2(float n);
 vec3 sRGBToLinear(vec3 rgb);
 
 vec3 BRDF();
@@ -29,8 +34,13 @@ vec3 BRDF_diffuse();
 float Fresnel_diffuse();
 float Subsurface();
 vec3 Sheen();
-
 vec3 BRDF_specular();
+float Distribution();
+vec3 Fresnel_specular();
+float Geometry();
+
+float GGX_anisotropic();
+float smith_GGX_anisotropic(float cosThetaN, float cosThetaX, float cosThetaY);
 
 const float PI = 3.1415926;
 
@@ -39,19 +49,35 @@ const float PI = 3.1415926;
 // O: outgoing dir
 // N: normal
 // H: halfway dir 
+// X: tangent
+// Y: bitangent
 float cosIN;
 float cosON;
 float cosIO;
 float cosIH;
 float cosNH;
+float cosXH;
+float cosYH;
+float cosIX;
+float cosIY;
+float cosOX;
+float cosOY;
 
 vec3 baseColor;
+vec3 linearColor;
+vec3 colorTint;
+
+float ax;
+float ay;
 
 void main() {
     vec3 normal = texture(material.texture_normal, f_in.texCoords).rgb;
     normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space
-    vec3 lightColor = vec3(1, 1, 1);
+
     baseColor = texture(material.texture_diffuse, f_in.texCoords).rgb;
+    linearColor = baseColor;
+    float luminance = 0.6 * linearColor.x + 0.3 * linearColor.y + 0.1 * linearColor.z;
+    colorTint = luminance > 0 ? linearColor/luminance : vec3(1);
 
     vec3 lightDir = normalize(-f_in.tangentLightDir);
     vec3 eyeDir = normalize(f_in.tangentEyePos - f_in.tangentPos);
@@ -61,9 +87,22 @@ void main() {
     cosIO = dot(lightDir, eyeDir);
     cosIH = dot(lightDir, halfwayDir);
     cosNH = dot(normal, halfwayDir);
-
     
+    vec3 tangent = vec3(1, 0, 0);
+    vec3 bitangent_ortho = normalize(cross(normal, tangent));
+    vec3 tangent_ortho  = cross(bitangent_ortho, normal);
+    cosXH = dot(tangent_ortho, halfwayDir);
+    cosYH = dot(bitangent_ortho, halfwayDir);
+    cosIX = dot(lightDir, tangent_ortho);
+    cosIY = dot(lightDir, bitangent_ortho);
+    cosOX = dot(eyeDir, tangent_ortho);
+    cosOY = dot(eyeDir, bitangent_ortho);
 
+    float aspect = sqrt(1 - material.anisotropic * 0.9);
+    ax = max(0.001, pow2(material.roughness) / aspect);
+    ay = max(0.001, pow2(material.roughness) * aspect);
+
+    vec3 lightColor = vec3(3, 3, 3);
     float diff = max(cosIN, 0.0);
     vec3 diffuse = BRDF() * lightColor * diff;
 
@@ -75,22 +114,27 @@ float pow5(float n) {
     return n2 * n2 * n;
 }
 
+float pow2(float n) {
+    return n * n;
+}
+
 vec3 sRGBToLinear(vec3 rgb)
 {
     vec3 linearPart = rgb * (1.0 / 12.92);
-    vec3 expPart    = pow((rgb + 0.055) * (1.0 / 1.055), vec3(2.4));
-    vec3 mask       = vec3(lessThanEqual(rgb, vec3(0.04045)));
+    vec3 expPart = pow((rgb + 0.055) * (1.0 / 1.055), vec3(2.4));
+    vec3 mask = vec3(lessThanEqual(rgb, vec3(0.04045)));
     return mix(expPart, linearPart, mask);
 }
 
 vec3 BRDF() {
-    return BRDF_diffuse() + BRDF_specular();
+    if(cosIN < 0) return vec3(0);
+    return BRDF_diffuse() * (1 - material.metallic) + BRDF_specular();
 }
 
 vec3 BRDF_diffuse() {
     float fd = Fresnel_diffuse();
     float ss = Subsurface();
-    return (baseColor / PI) * mix(fd, ss, material.subsurface) + Sheen();
+    return (linearColor / PI) * mix(fd, ss, material.subsurface) + Sheen();
 }
 
 float Fresnel_diffuse() {
@@ -107,13 +151,34 @@ float Subsurface() {
 }
 
 vec3 Sheen() {
-    vec3 linearColor = sRGBToLinear(baseColor);
-    float luminance = 0.6 * linearColor.x + 0.3 * linearColor.y + 0.1 * linearColor.z;
-    vec3 colorTint = luminance > 0 ? linearColor/luminance : vec3(1);
     vec3 colorSheen = mix(vec3(1), colorTint, material.sheenTint);
     return material.sheen * colorSheen * pow5(1 - cosIH);
 }
 
 vec3 BRDF_specular() {
-    return vec3(0);
+    float d = Distribution();
+    vec3 f = Fresnel_specular();
+    float g = Geometry();
+    return (d * f * g);// / (4 * cosIN * cosON);
+}
+
+float Distribution() {
+    return GGX_anisotropic();
+}
+
+vec3 Fresnel_specular() {
+    vec3 specularColor0 = mix(material.specular * 0.08 * mix(vec3(1), colorTint, material.specularTint), linearColor, material.metallic);
+    return mix(specularColor0, vec3(1), pow5(cosIH));
+}
+
+float Geometry() {
+    return smith_GGX_anisotropic(cosIN, cosIX, cosIY) * smith_GGX_anisotropic(cosON, cosOX, cosOY);
+}
+
+float GGX_anisotropic() {
+    return 1.0 / (PI * ax * ay * pow2(pow2(cosXH / ax) + pow2(cosYH / ay) + pow2(cosNH)));
+}
+
+float smith_GGX_anisotropic(float cosThetaN, float cosThetaX, float cosThetaY) {
+    return 1 / (cosThetaN + sqrt(pow2(cosThetaX * ax) + pow2(cosThetaY * ay) + pow2(cosThetaN)));
 }
