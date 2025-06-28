@@ -6,6 +6,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <imgui.h>
 
 MainScene::MainScene() {
 
@@ -33,9 +34,15 @@ bool MainScene::Initialize(float aspect) {
 
 void MainScene::Update(double dt) {
 	camera.Update();
-	glm::vec4 light = glm::vec4(lightDir, 1);
-	//light = glm::rotate(glm::mat4(1.0f), 0.03f, glm::vec3(0, 1, 0)) * light;
-	lightDir = glm::vec3(light);
+
+	if (isLightRotate) {
+		glm::vec4 light = glm::vec4(lightDir, 1);
+		light = glm::rotate(glm::mat4(1.0f), 0.01f, glm::vec3(0, 1, 0)) * light;
+		lightDir = glm::vec3(light);
+	}
+	
+	fps = 1.0 / dt;
+	deltaTime = dt * 1000.0;
 }
 
 void MainScene::Render() {
@@ -93,12 +100,19 @@ void MainScene::LoadMaterial() {
 	plaster.normalMap.id = Texture::LoadTexture(Path::Texture::PLASTER_NORMAL, false);
 	plaster.useNormalMap = true;
 	plaster.useRoughnessMap = Texture::LoadTexture(Path::Texture::PLASTER_ROUGHNESS, false);
+
+	woodFloor.baseColorMap.id = Texture::LoadTexture(Path::Texture::WOODFLOOR, true);
+	woodFloor.useBaseColorMap = true;
+	woodFloor.normalMap.id = Texture::LoadTexture(Path::Texture::WOODFLOOR_NORMAL, false);
+	woodFloor.useNormalMap = true;
+	woodFloor.useRoughnessMap = Texture::LoadTexture(Path::Texture::WOODFLOOR_ROUGHNESS, false);
 }
 
 void MainScene::LoadModel() {
 	sphere = new Model(Path::Model::SPHERE);
 	Mesh& sphereMesh = sphere->GetMesh(0);
-	sphereMesh.material = plaster;
+	sphereMat = &woodFloor;
+	sphereMesh.SetMaterial(sphereMat);
 }
 
 #pragma region Event
@@ -147,5 +161,28 @@ void MainScene::OnMouseMove(double x, double y) {
 /// </summary>
 void MainScene::OnScroll(double xoffset, double yoffset) {
 	camera.OnScroll(xoffset, yoffset);
+}
+#pragma endregion
+
+#pragma region GUI
+void MainScene::DrawGUI() {
+	ImGui::Text("FPS: %d (%.3fms)", (int)fps, deltaTime);
+	ImGui::Checkbox("Light Rotate", &isLightRotate);
+
+	Material* material = sphereMat;
+	if (material != &Material::Default()) {
+		ImGui::SeparatorText("Material Parameters:");
+		ImGui::SliderFloat("Roughness", &material->roughness, 0.0f, 1.0f);
+		ImGui::SliderFloat("Subsurface", &material->subsurface, 0.0f, 1.0f);
+		ImGui::SliderFloat("Sheen", &material->sheen, 0.0f, 1.0f);
+		ImGui::SliderFloat("Sheen Tint", &material->sheenTint, 0.0f, 1.0f);
+		ImGui::SliderFloat("Anisotropic", &material->anisotropic, 0.0f, 1.0f);
+		ImGui::SliderFloat("Specular", &material->specular, 0.0f, 1.0f);
+		ImGui::SliderFloat("Specular Tint", &material->specularTint, 0.0f, 1.0f);
+		ImGui::SliderFloat("Metallic", &material->metallic, 0.0f, 1.0f);
+		ImGui::SliderFloat("Clearcoat", &material->clearcoat, 0.0f, 1.0f);
+		ImGui::SliderFloat("Clearcoat Gloss", &material->clearcoatGloss, 0.0f, 1.0f);
+	}
+	
 }
 #pragma endregion

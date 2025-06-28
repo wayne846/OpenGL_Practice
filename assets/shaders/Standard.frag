@@ -212,16 +212,9 @@ float Geometry_specular() {
     return smith_GGX_anisotropic(cosIN, cosIX, cosIY) * smith_GGX_anisotropic(cosON, cosOX, cosOY);
 }
 
-float GGX_anisotropic() {
-    return 1.0 / (PI * ax * ay * pow2(pow2(cosXH / ax) + pow2(cosYH / ay) + pow2(cosNH)));
-}
-
-float smith_GGX_anisotropic(float cosThetaN, float cosThetaX, float cosThetaY) {
-    return 1 / (cosThetaN + sqrt(pow2(cosThetaX * ax) + pow2(cosThetaY * ay) + pow2(cosThetaN)));
-}
 
 float BRDF_clearcoat() {
-    return 0.25 * material.clearcoat * Distribution_clearcoat() * Fresnel_clearcoat() * Geometry_specular();
+    return 0.25 * material.clearcoat * Distribution_clearcoat() * Fresnel_clearcoat() * Geometry_clearcoat();
 }
 
 float Distribution_clearcoat() {
@@ -234,6 +227,14 @@ float Fresnel_clearcoat() {
 
 float Geometry_clearcoat() {
     return smithG_GGX(cosIN, .25) * smithG_GGX(cosON, .25);
+}
+
+float GGX_anisotropic() {
+    return 1.0 / (PI * ax * ay * pow2(pow2(cosXH / ax) + pow2(cosYH / ay) + pow2(cosNH)));
+}
+
+float smith_GGX_anisotropic(float cosThetaN, float cosThetaX, float cosThetaY) {
+    return 1 / (cosThetaN + sqrt(pow2(cosThetaX * ax) + pow2(cosThetaY * ay) + pow2(cosThetaN)));
 }
 
 float GTR1(float a)

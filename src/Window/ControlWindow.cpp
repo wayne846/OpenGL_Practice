@@ -21,6 +21,7 @@ void ControlWindow::Display() {
 	{
 		ImGui::Checkbox("Demo Window", &showDemoWindow);
 
+		targetScene->DrawGUI();
 	}
 	ImGui::End();
 

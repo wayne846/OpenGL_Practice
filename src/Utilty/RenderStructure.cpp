@@ -123,6 +123,14 @@ void Mesh::SetupMesh()
 }
 
 /// <summary>
+/// 設定材質指標
+/// </summary>
+void Mesh::SetMaterial(Material* m) {
+    if (m == nullptr) return;
+    material = m;
+}
+
+/// <summary>
 /// 將網格畫出來
 /// </summary>
 void Mesh::Draw(Shader& shader) {
@@ -133,29 +141,29 @@ void Mesh::Draw(Shader& shader) {
     // texture
     glActiveTexture(GL_TEXTURE0);
     shader.setInt("material.texture_baseColor", 0);
-    glBindTexture(GL_TEXTURE_2D, material.baseColorMap.id);
+    glBindTexture(GL_TEXTURE_2D, material->baseColorMap.id);
     glActiveTexture(GL_TEXTURE1);
     shader.setInt("material.texture_normal", 1);
-    glBindTexture(GL_TEXTURE_2D, material.normalMap.id);
+    glBindTexture(GL_TEXTURE_2D, material->normalMap.id);
     glActiveTexture(GL_TEXTURE2);
     shader.setInt("material.texture_roughness", 2);
-    glBindTexture(GL_TEXTURE_2D, material.roughnessMap.id);
+    glBindTexture(GL_TEXTURE_2D, material->roughnessMap.id);
     // parameter
-    shader.setVec3("material.baseColor", material.baseColor);
-    shader.setFloat("material.roughness", material.roughness);
-    shader.setFloat("material.subsurface", material.subsurface);
-    shader.setFloat("material.sheen", material.sheen);
-    shader.setFloat("material.sheenTint", material.sheenTint);
-    shader.setFloat("material.anisotropic", material.anisotropic);
-    shader.setFloat("material.specular", material.specular);
-    shader.setFloat("material.specularTint", material.specularTint);
-    shader.setFloat("material.metallic", material.metallic);
-    shader.setFloat("material.clearcoat", material.clearcoat);
-    shader.setFloat("material.clearcoatGloss", material.clearcoatGloss);
+    shader.setVec3("material.baseColor", material->baseColor);
+    shader.setFloat("material.roughness", material->roughness);
+    shader.setFloat("material.subsurface", material->subsurface);
+    shader.setFloat("material.sheen", material->sheen);
+    shader.setFloat("material.sheenTint", material->sheenTint);
+    shader.setFloat("material.anisotropic", material->anisotropic);
+    shader.setFloat("material.specular", material->specular);
+    shader.setFloat("material.specularTint", material->specularTint);
+    shader.setFloat("material.metallic", material->metallic);
+    shader.setFloat("material.clearcoat", material->clearcoat);
+    shader.setFloat("material.clearcoatGloss", material->clearcoatGloss);
     // bool
-    shader.setBool("material.useBaseColorMap", material.useBaseColorMap);
-    shader.setBool("material.useNormalMap", material.useNormalMap);
-    shader.setBool("material.useRoughnessMap", material.useRoughnessMap);
+    shader.setBool("material.useBaseColorMap", material->useBaseColorMap);
+    shader.setBool("material.useNormalMap", material->useNormalMap);
+    shader.setBool("material.useRoughnessMap", material->useRoughnessMap);
 
     // draw mesh
     glBindVertexArray(VAO);

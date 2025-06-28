@@ -25,6 +25,10 @@ namespace Path {
 		const std::string PLASTER = "assets/textures/Plaster_Color.jpg";
 		const std::string PLASTER_NORMAL = "assets/textures/Plaster_Normal.jpg";
 		const std::string PLASTER_ROUGHNESS = "assets/textures/Plaster_Roughness.jpg";
+
+		const std::string WOODFLOOR = "assets/textures/WoodFloor_Color.jpg";
+		const std::string WOODFLOOR_NORMAL = "assets/textures/WoodFloor_Normal.jpg";
+		const std::string WOODFLOOR_ROUGHNESS = "assets/textures/WoodFloor_Roughness.jpg";
 	}
 	
 	/// <summary>

@@ -44,3 +44,7 @@ void Scene::OnMouseMove(double x, double y) {
 void Scene::OnScroll(double xoffset, double yoffset) {
 	std::cout << "Scene OnScroll: " << xoffset << " " << yoffset << std::endl;
 }
+
+void Scene::DrawGUI() {
+
+}

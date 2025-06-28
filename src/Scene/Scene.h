@@ -27,6 +27,8 @@ public:
 	virtual void OnMouseMove(double x, double y);
 	virtual void OnScroll(double xoffset, double yoffset);
 
+	virtual void DrawGUI();
+
 protected:
 	Camera camera;
 };

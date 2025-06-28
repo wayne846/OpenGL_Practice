@@ -57,6 +57,11 @@ struct Material {
     bool useBaseColorMap = false;
     bool useNormalMap = false;
     bool useRoughnessMap = false;
+
+    static const Material& Default() {
+        static const Material instance = Material();
+        return instance;
+    }
 };
 
 class Mesh {
@@ -64,17 +69,21 @@ public:
     // mesh data
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    Material material;
+    
     Transform transform;
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
     void Draw(Shader& shader);
+    void SetMaterial(Material* m);
+
+private:
+    void SetupMesh();
 
 private:
     //  render data
     unsigned int VAO, VBO, EBO;
 
-    void SetupMesh();
+    const Material* material = &Material::Default();
 };
 
 class Model{
