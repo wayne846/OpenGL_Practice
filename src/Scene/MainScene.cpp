@@ -111,7 +111,7 @@ void MainScene::LoadMaterial() {
 void MainScene::LoadModel() {
 	sphere = new Model(Path::Model::SPHERE);
 	Mesh& sphereMesh = sphere->GetMesh(0);
-	sphereMat = &woodFloor;
+	sphereMat = &basic;
 	sphereMesh.SetMaterial(sphereMat);
 }
 
@@ -172,6 +172,7 @@ void MainScene::DrawGUI() {
 	Material* material = sphereMat;
 	if (material != &Material::Default()) {
 		ImGui::SeparatorText("Material Parameters:");
+		ImGui::ColorEdit3("Base Color", glm::value_ptr(material->baseColor));
 		ImGui::SliderFloat("Roughness", &material->roughness, 0.0f, 1.0f);
 		ImGui::SliderFloat("Subsurface", &material->subsurface, 0.0f, 1.0f);
 		ImGui::SliderFloat("Sheen", &material->sheen, 0.0f, 1.0f);
