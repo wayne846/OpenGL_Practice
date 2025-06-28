@@ -78,17 +78,21 @@ void MainScene::LoadShader() {
 }
 
 void MainScene::LoadMaterial() {
-	brickwall.diffuseMap.id = Texture::LoadTexture(Path::Texture::BRICKWALL, true);
+	brickwall.baseColorMap.id = Texture::LoadTexture(Path::Texture::BRICKWALL, true);
+	brickwall.useBaseColorMap = true;
 	brickwall.normalMap.id = Texture::LoadTexture(Path::Texture::BRICKWALL_NORMAL, false);
+	brickwall.useNormalMap = true;
 
-	badlands.diffuseMap.id = Texture::LoadTexture(Path::Texture::BADLANDS, true);
+	badlands.baseColorMap.id = Texture::LoadTexture(Path::Texture::BADLANDS, true);
+	badlands.useBaseColorMap = true;
 	badlands.normalMap.id = Texture::LoadTexture(Path::Texture::BADLANDS_NORMAL, false);
+	badlands.useNormalMap = true;
 
-	plaster.diffuseMap.id = Texture::LoadTexture(Path::Texture::PLASTER, true);
+	plaster.baseColorMap.id = Texture::LoadTexture(Path::Texture::PLASTER, true);
+	plaster.useBaseColorMap = true;
 	plaster.normalMap.id = Texture::LoadTexture(Path::Texture::PLASTER_NORMAL, false);
-	plaster.roughness = 0.5;
-	plaster.anisotropic = 0;
-	plaster.metallic = 0;
+	plaster.useNormalMap = true;
+	plaster.useRoughnessMap = Texture::LoadTexture(Path::Texture::PLASTER_ROUGHNESS, false);
 }
 
 void MainScene::LoadModel() {

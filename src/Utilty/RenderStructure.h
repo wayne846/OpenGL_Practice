@@ -38,8 +38,11 @@ public:
 };
 
 struct Material {
-    Texture diffuseMap;
+    Texture baseColorMap;
     Texture normalMap;
+    Texture roughnessMap;
+
+    glm::vec3 baseColor = glm::vec3(1, 1, 1);
     float roughness = 0.5f;
     float subsurface = 0.0f;
     float sheen = 0.0f;
@@ -48,6 +51,12 @@ struct Material {
     float specular = 0.5;
     float specularTint = 0;
     float metallic = 0;
+    float clearcoat = 0;
+    float clearcoatGloss = 1;
+
+    bool useBaseColorMap = false;
+    bool useNormalMap = false;
+    bool useRoughnessMap = false;
 };
 
 class Mesh {

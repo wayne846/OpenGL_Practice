@@ -7,6 +7,11 @@ Camera::Camera() {
     projection = glm::mat4(1.0);
     view = glm::mat4(1.0);
 
+    pos = glm::vec3(2, 0, 0);
+    dir = -pos;
+    radius = glm::length(pos);
+    SetAxesByDir();
+
     fov = 80.0f;
     aspect = 1280.0f / 720.0f;
     clipNear = 0.01f;
@@ -63,7 +68,7 @@ void Camera::SetClip(float near1, float far1) {
 }
 
 void Camera::SetDir(glm::vec3 d) {
-    dir = d;
+    dir = glm::normalize(d);
     SetAxesByDir();
 
     UpdateViewMatrix(pos, pos + dir, MathHelper::VEC3_UP);
@@ -80,6 +85,8 @@ void Camera::SetPos(glm::vec3 p) {
 /// </summary>
 void Camera::LookAt(glm::vec3 point) {
     SetDir(point - pos);
+    radius = glm::length(point - pos);
+
 }
 #pragma endregion
 
@@ -182,7 +189,7 @@ void Camera::OnMouseButton(int button, int action) {
     if (action == GLFW_PRESS) {
         switch (button) {
         case GLFW_MOUSE_BUTTON_1: //左鍵
-            mode = Mode::Rotate;
+            mode = Mode::Orbit;
             isFly = false;
             break;
 
@@ -227,13 +234,33 @@ void Camera::OnMouseMove(double x, double y) {
         SetDirByAxes();
         break;
 
+    case Mode::Orbit: {
+        glm::vec3 target = pos + dir * radius;
+        glm::vec3 offset = pos - target;
+        float orbitPitch = glm::degrees(asin(offset.y / radius));
+        float orbitYaw = glm::degrees(atan2(offset.z, offset.x));
+
+        orbitYaw += deltaX * sensitivity;
+        orbitPitch += deltaY * sensitivity;
+        orbitPitch = glm::clamp(orbitPitch, -89.0f, 89.0f);
+        
+        float radPitch = glm::radians(orbitPitch);
+        float radYaw = glm::radians(orbitYaw);
+        pos.x = target.x + radius * cos(radPitch) * cos(radYaw);
+        pos.y = target.y + radius * sin(radPitch);
+        pos.z = target.z + radius * cos(radPitch) * sin(radYaw);
+
+        dir = glm::normalize(target - pos);
+        SetAxesByDir();
+        break;
+    }
+
     case Mode::Pan:
-        glm::vec3 dir = GetDir();
         glm::vec3 right = glm::normalize(glm::cross(dir, MathHelper::VEC3_UP)); // 右方向
         glm::vec3 up = glm::normalize(glm::cross(right, dir));      // 上方向，通常跟 worldUp 差不多
 
-        pos += right * -(float)deltaX * sensitivity * 0.2f;
-        pos += up * (float)deltaY * sensitivity * 0.2f;
+        pos += right * -(float)deltaX * sensitivity * 0.15f;
+        pos += up * (float)deltaY * sensitivity * 0.15f;
         break;
     }
 }
@@ -242,7 +269,7 @@ void Camera::OnMouseMove(double x, double y) {
 /// 滑鼠滾輪滾動事件，前進和後退
 /// </summary>
 void Camera::OnScroll(double xoffset, double yoffset) {
-    glm::vec3 dir = GetDir();
     pos += dir * (float)yoffset * sensitivity * 5.0f;
+    radius -= (float)yoffset * sensitivity * 5.0f;
 }
 #pragma endregion

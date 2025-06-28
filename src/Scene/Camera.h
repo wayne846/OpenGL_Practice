@@ -43,6 +43,7 @@ private:
     enum class Mode {
         None,   // 不移動
         Rotate, // 旋轉
+        Orbit,  // 球面旋轉
         Pan     // 平移
     };
 
@@ -55,6 +56,7 @@ private:
     glm::vec3 dir;
     float yaw;   // 左右旋轉
     float pitch; // 上下旋轉
+    float radius;// 球面旋轉
 
     // 暫存滑鼠的座標
     double mouseX;
